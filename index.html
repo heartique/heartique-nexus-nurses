@@ -2,87 +2,57 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Heartique Nexus Nurses - Login</title>
+  <title>Login - Heartique Nexus Nurses</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .login-container {
-      background: white;
-      padding: 40px 30px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      width: 320px;
       text-align: center;
+      padding: 50px;
     }
-    h2 {
+
+    h1 {
       color: #ba0f30;
-      margin-bottom: 20px;
     }
-    input[type="text"],
-    input[type="password"] {
-      width: 90%;
-      padding: 10px;
-      margin: 10px 0 20px 0;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 1em;
-    }
+
     button {
+      padding: 15px 30px;
+      font-size: 1.1em;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
       background: #ba0f30;
       color: white;
-      border: none;
-      padding: 12px 20px;
-      font-size: 1em;
-      border-radius: 6px;
       cursor: pointer;
-      width: 95%;
-      transition: background 0.3s;
     }
+
     button:hover {
-      background: #8a0a22;
+      background: #a10d28;
     }
-    .error {
-      color: red;
-      margin-bottom: 15px;
+
+    .note {
+      margin-top: 40px;
       font-size: 0.9em;
+      color: #555;
     }
   </style>
 </head>
 <body>
 
-  <div class="login-container">
-    <h2>Login to Heartique Nexus</h2>
-    <div id="error-msg" class="error"></div>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-  </div>
+  <h1>Welcome to Heartique Nexus Nurses</h1>
+  <p>Please log in or create an account:</p>
+
+  <button onclick="login('student')">I'm a Student</button>
+  <button onclick="login('tutor')">I'm a Tutor</button>
+  <br />
+  <button onclick="window.location.href='create_account.html'">Create Account</button>
+
+  <div class="note">Note: This is a demo. No real account is created or stored.</div>
 
   <script>
-    function login() {
-      const user = document.getElementById('username').value.trim();
-      const pass = document.getElementById('password').value.trim();
-      const errorDiv = document.getElementById('error-msg');
-
-      // Simple hardcoded user credentials for demo:
-      const users = {
-        student1: 'studentpass',
-        tutor1: 'tutorpass'
-      };
-
-      if(users[user] && users[user] === pass) {
-        // On success, redirect to main page
-        window.location.href = 'main.html';
-      } else {
-        errorDiv.textContent = 'Invalid username or password. Please try again.';
-      }
+    function login(role) {
+      localStorage.setItem('userRole', role);
+      window.location.href = 'main.html';
     }
   </script>
 
