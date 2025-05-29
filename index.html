@@ -2,83 +2,86 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Login - Heartique Nexus Nurses</title>
+  <title>Heartique Nexus Nurses - Login</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f5f5f5;
       display: flex;
-      height: 100vh;
       justify-content: center;
       align-items: center;
+      height: 100vh;
       margin: 0;
     }
     .login-container {
       background: white;
       padding: 40px 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
       width: 320px;
       text-align: center;
     }
     h2 {
       color: #ba0f30;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
-    input[type="text"], input[type="password"] {
-      width: 100%;
-      padding: 12px;
-      margin: 8px 0 20px;
+    input[type="text"],
+    input[type="password"] {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0 20px 0;
       border: 1px solid #ccc;
       border-radius: 6px;
-      box-sizing: border-box;
       font-size: 1em;
     }
     button {
-      background-color: #ba0f30;
+      background: #ba0f30;
       color: white;
       border: none;
-      padding: 12px;
-      width: 100%;
-      border-radius: 6px;
+      padding: 12px 20px;
       font-size: 1em;
+      border-radius: 6px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      width: 95%;
+      transition: background 0.3s;
     }
     button:hover {
-      background-color: #8a0b21;
+      background: #8a0a22;
     }
     .error {
       color: red;
       margin-bottom: 15px;
-      display: none;
+      font-size: 0.9em;
     }
   </style>
 </head>
 <body>
 
   <div class="login-container">
-    <h2>Login to Heartique Nexus Nurses</h2>
-    <div id="error" class="error">Invalid username or password.</div>
+    <h2>Login to Heartique Nexus</h2>
+    <div id="error-msg" class="error"></div>
     <input type="text" id="username" placeholder="Username" />
     <input type="password" id="password" placeholder="Password" />
     <button onclick="login()">Login</button>
   </div>
 
   <script>
-    // Simple demo login check (no backend)
     function login() {
       const user = document.getElementById('username').value.trim();
       const pass = document.getElementById('password').value.trim();
-      const errorDiv = document.getElementById('error');
+      const errorDiv = document.getElementById('error-msg');
 
-      // Simple hardcoded user check
-      if ((user === 'student' && pass === 'student123') || (user === 'tutor' && pass === 'tutor123')) {
-        // Redirect to main portal page on success
-        window.location.href = 'main.html';  // Change 'main.html' to your main portal page filename
+      // Simple hardcoded user credentials for demo:
+      const users = {
+        student1: 'studentpass',
+        tutor1: 'tutorpass'
+      };
+
+      if(users[user] && users[user] === pass) {
+        // On success, redirect to main page
+        window.location.href = 'main.html';
       } else {
-        // Show error message
-        errorDiv.style.display = 'block';
+        errorDiv.textContent = 'Invalid username or password. Please try again.';
       }
     }
   </script>
