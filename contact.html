@@ -1,60 +1,120 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Contact Us - Heartique Nexus Nurses</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Contact - Heartique Nexus Nurses</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
       padding: 20px;
-      background: #f9f9f9;
-    }
-    .contact-container {
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
       max-width: 600px;
       margin: auto;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    input, textarea {
+
+    h1 {
+      color: #ba0f30;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    textarea {
       width: 100%;
       padding: 10px;
-      margin-top: 10px;
-      margin-bottom: 20px;
       border: 1px solid #ccc;
-      border-radius: 5px;
+      border-radius: 8px;
+      font-size: 1em;
+      resize: vertical;
     }
+
+    textarea {
+      height: 120px;
+    }
+
     button {
-      background-color: #007BFF;
+      margin-top: 20px;
+      background-color: #ba0f30;
       color: white;
-      padding: 10px 20px;
       border: none;
-      border-radius: 5px;
+      padding: 12px 20px;
+      font-size: 1em;
+      border-radius: 8px;
       cursor: pointer;
+      transition: background-color 0.3s ease;
     }
+
     button:hover {
-      background-color: #0056b3;
+      background-color: #8a0a24;
+    }
+
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      color: #777;
+      font-size: 0.9em;
+    }
+
+    a.back-link {
+      display: inline-block;
+      margin-top: 15px;
+      color: #ba0f30;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    a.back-link:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <div class="contact-container">
-    <h2>Contact Us</h2>
-    <p>Have questions, suggestions, or need help? Reach out below:</p>
-    <form>
-      <label for="name">Your Name:</label>
-      <input type="text" id="name" placeholder="Enter your name" required>
 
-      <label for="email">Your Email:</label>
-      <input type="email" id="email" placeholder="Enter your email" required>
+  <h1>Contact Us</h1>
 
-      <label for="message">Message:</label>
-      <textarea id="message" rows="5" placeholder="Type your message here..." required></textarea>
+  <form id="contactForm">
+    <label for="name">Your Name</label>
+    <input type="text" id="name" name="name" placeholder="Enter your full name" required />
 
-      <button type="submit">Send Message</button>
-    </form>
+    <label for="email">Email Address</label>
+    <input type="email" id="email" name="email" placeholder="Enter your email" required />
+
+    <label for="message">Message</label>
+    <textarea id="message" name="message" placeholder="Write your message here..." required></textarea>
+
+    <button type="submit">Send Message</button>
+  </form>
+
+  <a href="index.html" class="back-link">← Back to Home</a>
+
+  <div class="footer">
+    © 2025 Heartique Nexus Nurses
   </div>
+
+  <script>
+    // Simple form submit handler (no backend)
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      alert('Thank you for contacting us, ' + this.name.value + '! We will get back to you shortly.');
+      this.reset();
+    });
+  </script>
+
 </body>
 </html>
