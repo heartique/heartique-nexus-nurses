@@ -32,24 +32,82 @@
       margin-top: 30px;
     }
 
+    /* Base block style */
     .block {
       background: white;
-      border: 2px solid #ba0f30;
       border-radius: 12px;
       padding: 30px 20px;
       text-align: center;
       font-weight: bold;
       font-size: 1.1em;
-      color: #ba0f30;
       text-decoration: none;
       box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
       transition: background 0.3s, color 0.3s;
+      cursor: pointer;
     }
 
-    .block:hover {
+    /* Seniority colors for blocks */
+    .block-pts {
+      border: 2px solid #ba0f30;
+      color: #ba0f30;
+    }
+    .block-pts:hover {
       background: #ba0f30;
       color: white;
-      cursor: pointer;
+    }
+
+    .block-1 {
+      border: 2px solid #4caf50; /* green */
+      color: #4caf50;
+    }
+    .block-1:hover {
+      background: #4caf50;
+      color: white;
+    }
+
+    .block-2 {
+      border: 2px solid #2196f3; /* blue */
+      color: #2196f3;
+    }
+    .block-2:hover {
+      background: #2196f3;
+      color: white;
+    }
+
+    .block-3 {
+      border: 2px solid #ff9800; /* orange */
+      color: #ff9800;
+    }
+    .block-3:hover {
+      background: #ff9800;
+      color: white;
+    }
+
+    .block-4 {
+      border: 2px solid #9c27b0; /* purple */
+      color: #9c27b0;
+    }
+    .block-4:hover {
+      background: #9c27b0;
+      color: white;
+    }
+
+    .block-5 {
+      border: 2px solid #f44336; /* red */
+      color: #f44336;
+    }
+    .block-5:hover {
+      background: #f44336;
+      color: white;
+    }
+
+    .block-6 {
+      border: 2px solid #795548; /* brown */
+      color: #795548;
+    }
+    .block-6:hover {
+      background: #795548;
+      color: white;
     }
 
     .footer {
@@ -73,39 +131,39 @@
   </p>
 
   <div class="blocks">
-    <a href="pts.html" class="block">PTS</a>
-
-    <a href="#" class="block">Block 1</a>
-    <a href="#" class="block">Block 2</a>
-    <a href="#" class="block">Block 3</a>
-    <a href="#" class="block">Block 4</a>
-    <a href="#" class="block">Block 5</a>
-    <a href="#" class="block">Block 6</a>
+    <a href="pts.html" class="block block-pts">PTS</a>
+    <a href="#" class="block block-1">Block 1</a>
+    <a href="#" class="block block-2">Block 2</a>
+    <a href="#" class="block block-3">Block 3</a>
+    <a href="#" class="block block-4">Block 4</a>
+    <a href="#" class="block block-5">Block 5</a>
+    <a href="#" class="block block-6">Block 6</a>
   </div>
-<h2 style="margin-top: 40px; color: #ba0f30;">📚 Quick Access to Materials</h2>
 
-<div class="blocks">
-  <a href="pts_revision.html" class="block">PTS Revision</a>
-  <a href="pts_pastpapers.html" class="block">PTS Past Papers</a>
+  <h2 style="margin-top: 40px; color: #ba0f30;">📚 Quick Access to Materials</h2>
 
-  <a href="block1_revision.html" class="block">Block 1 Revision</a>
-  <a href="block1_pastpapers.html" class="block">Block 1 Past Papers</a>
+  <div class="blocks">
+    <a href="pts_revision.html" class="block block-pts">PTS Revision</a>
+    <a href="pts_pastpapers.html" class="block block-pts">PTS Past Papers</a>
 
-  <a href="block2_revision.html" class="block">Block 2 Revision</a>
-  <a href="block2_pastpapers.html" class="block">Block 2 Past Papers</a>
+    <a href="block1_revision.html" class="block block-1">Block 1 Revision</a>
+    <a href="block1_pastpapers.html" class="block block-1">Block 1 Past Papers</a>
 
-  <a href="block3_revision.html" class="block">Block 3 Revision</a>
-  <a href="block3_pastpapers.html" class="block">Block 3 Past Papers</a>
+    <a href="block2_revision.html" class="block block-2">Block 2 Revision</a>
+    <a href="block2_pastpapers.html" class="block block-2">Block 2 Past Papers</a>
 
-  <a href="block4_revision.html" class="block">Block 4 Revision</a>
-  <a href="block4_pastpapers.html" class="block">Block 4 Past Papers</a>
+    <a href="block3_revision.html" class="block block-3">Block 3 Revision</a>
+    <a href="block3_pastpapers.html" class="block block-3">Block 3 Past Papers</a>
 
-  <a href="block5_revision.html" class="block">Block 5 Revision</a>
-  <a href="block5_pastpapers.html" class="block">Block 5 Past Papers</a>
+    <a href="block4_revision.html" class="block block-4">Block 4 Revision</a>
+    <a href="block4_pastpapers.html" class="block block-4">Block 4 Past Papers</a>
 
-  <a href="block6_revision.html" class="block">Block 6 Revision</a>
-  <a href="block6_pastpapers.html" class="block">Block 6 Past Papers</a>
-</div>
+    <a href="block5_revision.html" class="block block-5">Block 5 Revision</a>
+    <a href="block5_pastpapers.html" class="block block-5">Block 5 Past Papers</a>
+
+    <a href="block6_revision.html" class="block block-6">Block 6 Revision</a>
+    <a href="block6_pastpapers.html" class="block block-6">Block 6 Past Papers</a>
+  </div>
 
   <div class="footer">
     © 2025 Heartique Nexus Nurses. All rights reserved.
