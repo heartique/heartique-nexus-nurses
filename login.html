@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - Heartique Nexus Nurses</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      padding: 40px;
+      max-width: 500px;
+      margin: auto;
+    }
+
+    h2 {
+      text-align: center;
+      color: #ba0f30;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #ba0f30;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #a10c28;
+    }
+
+    p {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    a {
+      color: #ba0f30;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Login</h2>
+
+  <div class="form-group">
+    <input type="email" id="email" placeholder="Email Address" required />
+  </div>
+
+  <div class="form-group">
+    <input type="password" id="password" placeholder="Password" required />
+  </div>
+
+  <button onclick="login()">Log In</button>
+
+  <p>Don't have an account? <a href="create_account.html">Create one</a></p>
+
+  <script>
+    function login() {
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Dummy check: this demo does not store credentials, just user name
+      const userName = localStorage.getItem('userName');
+
+      if (email && password && userName) {
+        alert("Login successful!");
+        window.location.href = "main.html";
+      } else {
+        alert("Invalid login. Please create an account first.");
+      }
+    }
+  </script>
+
+</body>
+</html>
