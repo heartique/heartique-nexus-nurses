@@ -112,8 +112,8 @@
       fileDisplay.innerHTML = '';
 
       Array.from(fileList).forEach(file => {
-        const fileURL = URL.createObjectURL(file);
         const ext = file.name.split('.').pop().toLowerCase();
+        const fileURL = URL.createObjectURL(file);
 
         const container = document.createElement('div');
         container.className = 'file-entry';
@@ -123,14 +123,24 @@
         if (ext === 'pdf') {
           container.innerHTML = `
             <p>📄 ${file.name}
-              <button class="btn" onclick="document.getElementById('${iframeId}').style.display='block'">Read</button>
+              <button class="btn" onclick="toggleReader('${iframeId}')">Read</button>
               <a href="${fileURL}" download><button class="btn">Download</button></a>
             </p>
-            <iframe id="${iframeId}" src="${fileURL}"></iframe>
+            <iframe id="${iframeId}" src="${fileURL}" style="display:none;"></iframe>
+          `;
+        } else if (ext === 'docx' || ext === 'pptx') {
+          const officeViewerURL = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fileURL)}`;
+          container.innerHTML = `
+            <p>📄 ${file.name}
+              <button class="btn" onclick="toggleReader('${iframeId}')">Read</button>
+              <a href="${fileURL}" download><button class="btn">Download</button></a>
+            </p>
+            <iframe id="${iframeId}" src="${officeViewerURL}" style="display:none;"></iframe>
           `;
         } else {
           container.innerHTML = `
             <p>📄 ${file.name}
+              <span style="color: gray;">(Preview not supported)</span>
               <a href="${fileURL}" download><button class="btn">Download</button></a>
             </p>
           `;
@@ -138,6 +148,15 @@
 
         fileDisplay.appendChild(container);
       });
+    }
+
+    function toggleReader(id) {
+      const iframe = document.getElementById(id);
+      if (iframe.style.display === 'none') {
+        iframe.style.display = 'block';
+      } else {
+        iframe.style.display = 'none';
+      }
     }
 
     function saveLink(unit, value, type) {
