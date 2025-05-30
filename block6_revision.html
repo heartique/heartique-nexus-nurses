@@ -6,7 +6,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #fdfdfd;
+      background: #fff8f5;
       color: #333;
       padding: 20px;
       max-width: 900px;
@@ -18,34 +18,38 @@
       text-align: center;
     }
 
-    .topic {
+    .upload-section, .download-section, .engage-section {
       background: #fff;
       border-radius: 12px;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       padding: 20px;
-      margin-bottom: 20px;
+      margin: 20px 0;
     }
 
-    .topic h2 {
-      font-size: 1.2em;
-      margin-bottom: 10px;
-      color: #444;
+    input[type="file"] {
+      margin-top: 10px;
     }
 
-    .checklist label {
-      display: block;
-      margin: 5px 0;
-    }
-
-    select {
-      padding: 4px 10px;
+    .btn {
+      padding: 10px 20px;
+      margin-top: 10px;
+      background-color: #795548;
+      color: white;
+      border: none;
       border-radius: 6px;
-      margin-left: 10px;
+      cursor: pointer;
     }
 
-    .note-text {
-      font-size: 1em;
-      line-height: 1.6;
+    ul {
+      padding-left: 20px;
+    }
+
+    .engage-section {
+      background: #fff3e0;
+    }
+
+    .tip, .joke {
+      font-style: italic;
       margin-top: 10px;
       color: #555;
     }
@@ -53,88 +57,74 @@
 </head>
 <body>
 
-  <h1>🧠 Block 6 Revision Notes</h1>
+  <h1>📚 Block 6 Revision Sharing</h1>
 
-  <div class="topic">
-    <h2>1. Introduction to Psychiatry</h2>
-    <div class="checklist">
-      <label>
-        Understanding of key terms:
-        <select>
-          <option>Not Started</option>
-          <option>Weak</option>
-          <option>Fair</option>
-          <option>Strong</option>
-        </select>
-      </label>
-      <label>
-        DSM-5 classification overview:
-        <select>
-          <option>Not Started</option>
-          <option>Weak</option>
-          <option>Fair</option>
-          <option>Strong</option>
-        </select>
-      </label>
-    </div>
-    <div class="note-text">
-      Psychiatry is the medical field devoted to the diagnosis, prevention, and treatment of mental disorders...
-    </div>
+  <div class="upload-section">
+    <h2>📤 Upload Your Notes</h2>
+    <input type="file" id="fileUpload" accept=".pdf,.doc,.docx" />
+    <button class="btn" onclick="uploadNote()">Upload</button>
+    <p id="uploadStatus"></p>
   </div>
 
-  <div class="topic">
-    <h2>2. Common Mental Disorders</h2>
-    <div class="checklist">
-      <label>
-        Depression and symptoms:
-        <select>
-          <option>Not Started</option>
-          <option>Weak</option>
-          <option>Fair</option>
-          <option>Strong</option>
-        </select>
-      </label>
-      <label>
-        Anxiety disorders and management:
-        <select>
-          <option>Not Started</option>
-          <option>Weak</option>
-          <option>Fair</option>
-          <option>Strong</option>
-        </select>
-      </label>
-    </div>
-    <div class="note-text">
-      Depression is characterized by persistent sadness, loss of interest, and impaired daily functioning...
-    </div>
+  <div class="download-section">
+    <h2>📥 Download Shared Notes</h2>
+    <ul id="noteList">
+      <li><a href="notes/psych_intro_summary.pdf" download>Psych Intro Summary.pdf</a></li>
+      <li><a href="notes/mental_health_notes_2024.docx" download>Mental Health Notes 2024.docx</a></li>
+    </ul>
   </div>
 
-  <div class="topic">
-    <h2>3. Psychiatric Nursing Care</h2>
-    <div class="checklist">
-      <label>
-        Communication techniques:
-        <select>
-          <option>Not Started</option>
-          <option>Weak</option>
-          <option>Fair</option>
-          <option>Strong</option>
-        </select>
-      </label>
-      <label>
-        Patient safety measures:
-        <select>
-          <option>Not Started</option>
-          <option>Weak</option>
-          <option>Fair</option>
-          <option>Strong</option>
-        </select>
-      </label>
-    </div>
-    <div class="note-text">
-      Effective psychiatric nursing involves therapeutic communication, trust building, and awareness of patient rights...
-    </div>
+  <div class="engage-section">
+    <h2>🎯 Stay Motivated</h2>
+    <p><strong>Study Tip:</strong> <span class="tip" id="studyTip">Always break your reading into 25-minute focus blocks!</span></p>
+    <p><strong>Joke of the Day:</strong> <span class="joke" id="studyJoke">Why did the brain take a nap? Because it needed a little “rest-neuron”!</span></p>
+    <button class="btn" onclick="newEngagement()">New Tip & Joke</button>
   </div>
+
+  <script>
+    function uploadNote() {
+      const uploadStatus = document.getElementById("uploadStatus");
+      const input = document.getElementById("fileUpload");
+      const file = input.files[0];
+
+      if (!file) {
+        uploadStatus.textContent = "❗ Please select a file to upload.";
+        return;
+      }
+
+      // Simulate uploading
+      uploadStatus.textContent = "⏳ Uploading...";
+      setTimeout(() => {
+        uploadStatus.textContent = `✅ ${file.name} uploaded successfully!`;
+        const list = document.getElementById("noteList");
+        const newItem = document.createElement("li");
+        newItem.innerHTML = `<a href="#">${file.name}</a>`;
+        list.appendChild(newItem);
+        input.value = ""; // Reset input
+      }, 1500);
+    }
+
+    function newEngagement() {
+      const tips = [
+        "Read with a highlighter and pen for active engagement.",
+        "Use flashcards to reinforce key definitions.",
+        "Teach a topic to a friend to master it.",
+        "Don't study when hungry — grab a snack first!",
+        "Revise past papers under timed conditions."
+      ];
+
+      const jokes = [
+        "Why don’t skeletons study? They don’t have the guts!",
+        "Nurse: 'Are you okay?' Me: 'No, I just failed anatomy — I lost my head!'",
+        "What do you call a nurse who loves coffee? A caffeine-ated caregiver.",
+        "Why was the stethoscope tired? Too many heart-to-hearts!",
+        "What's a psychiatrist's favorite exercise? Freudian slips!"
+      ];
+
+      document.getElementById("studyTip").textContent = tips[Math.floor(Math.random() * tips.length)];
+      document.getElementById("studyJoke").textContent = jokes[Math.floor(Math.random() * jokes.length)];
+    }
+  </script>
 
 </body>
 </html>
