@@ -51,30 +51,15 @@
       padding-left: 10px;
     }
 
-    label, input[type="file"] {
-      display: block;
-      margin-top: 8px;
-    }
-
-    .download-link {
-      display: inline-block;
-      margin-top: 10px;
-      background-color: #4caf50;
-      color: white;
-      padding: 8px 12px;
-      border-radius: 6px;
-      text-decoration: none;
-    }
-
-    .file-list {
-      margin-top: 10px;
+    input[type="file"] {
+      margin: 10px 0;
     }
 
     .file-list a {
       display: block;
+      margin: 5px 0;
       color: #007BFF;
-      text-decoration: underline;
-      margin-bottom: 5px;
+      text-decoration: none;
     }
 
     .tip {
@@ -88,13 +73,91 @@
 </head>
 <body>
 
-  <h1>Block 1 - Units Overview</h1>
+  <h1>Block 1 - Units</h1>
 
   <div class="search-container">
     <input type="text" id="searchInput" placeholder="Search Unit..." onkeyup="filterUnits()" />
   </div>
 
-  <div id="unitsContainer">
-    <!-- Units 1–15 -->
-    <script>
-      for (let i = 1; i
+  <div id="unitsContainer"></div>
+
+  <script>
+    // Create all 15 units with upload and display sections
+    function createUnits() {
+      const container = document.getElementById("unitsContainer");
+      for (let i = 1; i <= 15; i++) {
+        const unitBox = document.createElement("details");
+        unitBox.innerHTML = `
+          <summary>Unit ${i}</summary>
+          <div class="section">
+            <label>Upload a study file:</label>
+            <input type="file" onchange="handleUpload(event, ${i})" />
+            <div id="fileList${i}" class="file-list"></div>
+            <div class="tip">
+              <strong>🧠 Fun Study Tip:</strong> Review material within 24 hours of learning to boost retention!
+            </div>
+          </div>
+        `;
+        container.appendChild(unitBox);
+      }
+    }
+
+    // Save file data to localStorage
+    function handleUpload(event, unitNumber) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const fileData = {
+          name: file.name,
+          url: e.target.result
+        };
+
+        const key = `unit${unitNumber}_files`;
+        const stored = JSON.parse(localStorage.getItem(key) || "[]");
+        stored.push(fileData);
+        localStorage.setItem(key, JSON.stringify(stored));
+
+        displayFiles(unitNumber);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Display all files for a specific unit
+    function displayFiles(unitNumber) {
+      const key = `unit${unitNumber}_files`;
+      const files = JSON.parse(localStorage.getItem(key) || "[]");
+      const list = document.getElementById(`fileList${unitNumber}`);
+      list.innerHTML = "";
+
+      files.forEach(file => {
+        const link = document.createElement("a");
+        link.href = file.url;
+        link.textContent = file.name;
+        link.download = file.name;
+        list.appendChild(link);
+      });
+    }
+
+    // Search functionality
+    function filterUnits() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const details = document.querySelectorAll("#unitsContainer details");
+      details.forEach(detail => {
+        const text = detail.querySelector("summary").textContent.toLowerCase();
+        detail.style.display = text.includes(query) ? "" : "none";
+      });
+    }
+
+    // Init
+    window.onload = () => {
+      createUnits();
+      for (let i = 1; i <= 15; i++) {
+        displayFiles(i);
+      }
+    };
+  </script>
+
+</body>
+</html>
