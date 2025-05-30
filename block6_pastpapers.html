@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Block 6 Past Papers</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    .paper { margin-bottom: 30px; padding: 15px; border: 1px solid #ccc; border-radius: 10px; }
+    button { margin-top: 10px; margin-right: 10px; }
+  </style>
+</head>
+<body>
+
+  <h1>Block 6 PTS Past Papers</h1>
+
+  <div class="paper">
+    <h2>Psychiatry Paper 2024</h2>
+    <a href="papers/block6_psychiatry_2024.pdf" download>
+      <button>Download Paper</button>
+    </a>
+    
+    <input type="file" id="upload2024" />
+    <button onclick="assessPaper('upload2024')">Upload & Assess</button>
+    <div id="result2024"></div>
+  </div>
+
+  <script>
+    function assessPaper(inputId) {
+      const input = document.getElementById(inputId);
+      const file = input.files[0];
+      
+      if (!file) {
+        alert("Please upload your answer file.");
+        return;
+      }
+
+      // TODO: Send to backend for assessment
+      const resultDiv = document.getElementById('result2024');
+      resultDiv.innerHTML = "⏳ Assessing... (this requires backend integration)";
+      
+      // Placeholder response simulation
+      setTimeout(() => {
+        resultDiv.innerHTML = "✅ Score: 75% — Good job!";
+      }, 2000);
+    }
+  </script>
+
+</body>
+</html>
