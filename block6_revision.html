@@ -53,6 +53,11 @@
       margin-top: 10px;
       color: #555;
     }
+
+    a {
+      text-decoration: none;
+      color: #0077cc;
+    }
   </style>
 </head>
 <body>
@@ -69,7 +74,7 @@
   <div class="download-section">
     <h2>📥 Download Shared Notes</h2>
     <ul id="noteList">
-      <li><a href="notes/psych_intro_summary.pdf" download>Psych Intro Summary.pdf</a></li>
+      <!-- Existing notes can go here -->
       <li><a href="notes/mental_health_notes_2024.docx" download>Mental Health Notes 2024.docx</a></li>
     </ul>
   </div>
@@ -83,24 +88,30 @@
 
   <script>
     function uploadNote() {
+      const fileInput = document.getElementById("fileUpload");
+      const file = fileInput.files[0];
       const uploadStatus = document.getElementById("uploadStatus");
-      const input = document.getElementById("fileUpload");
-      const file = input.files[0];
 
       if (!file) {
         uploadStatus.textContent = "❗ Please select a file to upload.";
         return;
       }
 
-      // Simulate uploading
       uploadStatus.textContent = "⏳ Uploading...";
+
+      // Simulated upload delay
       setTimeout(() => {
         uploadStatus.textContent = `✅ ${file.name} uploaded successfully!`;
-        const list = document.getElementById("noteList");
-        const newItem = document.createElement("li");
-        newItem.innerHTML = `<a href="#">${file.name}</a>`;
-        list.appendChild(newItem);
-        input.value = ""; // Reset input
+
+        // Simulate downloadable link using blob
+        const url = URL.createObjectURL(file);
+        const noteList = document.getElementById("noteList");
+        const listItem = document.createElement("li");
+
+        listItem.innerHTML = `<a href="${url}" download="${file.name}">${file.name}</a>`;
+        noteList.appendChild(listItem);
+
+        fileInput.value = ""; // reset input
       }, 1500);
     }
 
