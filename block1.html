@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Block 1 Units - Heartique Nexus Nurses</title>
   <style>
     body {
@@ -15,6 +15,7 @@
     h1 {
       text-align: center;
       color: #4caf50;
+      margin-bottom: 15px;
     }
     .unit {
       background: white;
@@ -39,43 +40,45 @@
     }
     .file-entry {
       margin: 10px 0;
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .file-info {
+      flex: 1 1 60%;
+      overflow-wrap: break-word;
     }
     .btn {
-      background: #2e7d32; /* Dark Green */
+      background: #4caf50;
       color: white;
       border: none;
-      padding: 6px 14px;
-      border-radius: 5px;
+      padding: 5px 10px;
+      border-radius: 4px;
       cursor: pointer;
-      margin-left: 8px;
-      font-weight: 600;
-      transition: background 0.3s ease;
+      margin-left: 5px;
+      white-space: nowrap;
     }
-    .btn:hover {
-      background: #1b5e20; /* Darker Green */
+    .btn.delete {
+      background: #e53935;
     }
-    .btn.download-btn {
-      background: #1565c0; /* Blue */
-    }
-    .btn.download-btn:hover {
-      background: #0d47a1; /* Darker Blue */
-    }
-    .btn.delete-btn {
-      background: #d32f2f; /* Red */
-    }
-    .btn.delete-btn:hover {
-      background: #9a0007;
+    .btn.read {
+      background: #2196f3;
     }
     .editable-input {
       width: 100%;
       padding: 8px;
       margin-top: 5px;
       margin-bottom: 10px;
-      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
     .fun-tip {
       font-style: italic;
       color: #555;
+      margin-top: 10px;
     }
     .search-bar {
       margin-bottom: 20px;
@@ -87,13 +90,24 @@
     }
     .link-entry {
       margin: 8px 0;
+      padding: 6px 8px;
+      background: #f1f1f1;
+      border-radius: 5px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
     }
-    .link-entry a {
-      color: #1565c0;
+    .link-info {
+      flex: 1 1 70%;
+      overflow-wrap: break-word;
+    }
+    a {
+      color: #4caf50;
       text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
@@ -104,172 +118,249 @@
   <div id="unitsContainer"></div>
 
   <script>
+    // Get current user from localStorage or default to 'Guest'
+    let currentUser = localStorage.getItem('userName') || 'Guest';
+
+    // Key prefix for localStorage
+    const STORAGE_KEY = 'block1_unit_files';
+
     const unitsContainer = document.getElementById('unitsContainer');
 
+    // Load saved data from localStorage or create empty structure
+    let savedData = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+    // Generate 15 units
     for (let i = 1; i <= 15; i++) {
       const unitDiv = document.createElement('div');
       unitDiv.className = 'unit';
+      unitDiv.dataset.unit = i;
       unitDiv.innerHTML = `
         <h2>Unit ${i}</h2>
 
         <div class="upload-section">
           <label>Upload study files (PDF/DOCX/PPTX):</label><br />
-          <input type="file" multiple onchange="handleUpload(event, ${i})">
+          <input type="file" multiple accept=".pdf,.docx,.pptx" onchange="handleUpload(event, ${i})" />
         </div>
 
         <div id="file-list-${i}"></div>
 
         <label>Add Video Learning Link:</label>
-        <input type="text" class="editable-input" placeholder="Paste video URL..." onblur="saveLink(${i}, this.value, 'video')">
+        <input type="text" class="editable-input" placeholder="Paste video URL..." onblur="saveLink(${i}, this.value, 'video')" />
+
         <div id="video-link-${i}"></div>
 
         <label>Add Peer Contact Info:</label>
-        <input type="text" class="editable-input" placeholder="Enter name/number or WhatsApp link..." onblur="saveLink(${i}, this.value, 'contact')">
+        <input type="text" class="editable-input" placeholder="Enter name/number or WhatsApp link..." onblur="saveLink(${i}, this.value, 'contact')" />
+
         <div id="contact-info-${i}"></div>
 
         <p class="fun-tip">🧠 Fun Study Tip: Review material within 24 hours to strengthen memory retention!</p>
       `;
       unitsContainer.appendChild(unitDiv);
 
-      loadExtras(i);
-      loadFiles(i);
+      // Initialize display for this unit
+      renderUnitFiles(i);
+      renderLinks(i);
     }
 
-    // Store uploaded files per unit in localStorage
+    // Upload handler
     function handleUpload(event, unitNumber) {
       const files = event.target.files;
       if (!files.length) return;
 
-      let savedFiles = JSON.parse(localStorage.getItem(`unit${unitNumber}_files`) || '[]');
+      if (!savedData[unitNumber]) savedData[unitNumber] = { files: [], video: '', contact: '' };
 
       Array.from(files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          savedFiles.push({
-            name: file.name,
-            type: file.type,
-            dataUrl: e.target.result
-          });
-          localStorage.setItem(`unit${unitNumber}_files`, JSON.stringify(savedFiles));
-          loadFiles(unitNumber);
-        }
-        reader.readAsDataURL(file);
+        // Create a blob URL for reading/downloading
+        const url = URL.createObjectURL(file);
+
+        // Store the file data as an object with name, type, url, and owner
+        savedData[unitNumber].files.push({
+          id: generateId(),
+          name: file.name,
+          type: file.type,
+          url: url,
+          owner: currentUser
+        });
       });
-      event.target.value = ''; // Reset file input
+
+      saveData();
+      renderUnitFiles(unitNumber);
+
+      // Clear the input so the same file can be uploaded again if needed
+      event.target.value = '';
     }
 
-    // Load and display files with Read, Download & Delete buttons
-    function loadFiles(unitNumber) {
-      const fileDisplay = document.getElementById(`file-list-${unitNumber}`);
-      const files = JSON.parse(localStorage.getItem(`unit${unitNumber}_files`) || '[]');
-      fileDisplay.innerHTML = '';
+    // Render files list for a unit
+    function renderUnitFiles(unitNumber) {
+      const container = document.getElementById(`file-list-${unitNumber}`);
+      container.innerHTML = '';
 
-      files.forEach((file, index) => {
+      if (!savedData[unitNumber] || !savedData[unitNumber].files.length) {
+        container.innerHTML = `<p><em>No files uploaded yet.</em></p>`;
+        return;
+      }
+
+      savedData[unitNumber].files.forEach(file => {
         const ext = file.name.split('.').pop().toLowerCase();
+        const isPdf = ext === 'pdf';
 
-        const container = document.createElement('div');
-        container.className = 'file-entry';
+        const fileDiv = document.createElement('div');
+        fileDiv.className = 'file-entry';
 
-        // For PDF show Read button & iframe, for others only Download & Delete
-        if (ext === 'pdf') {
-          const iframeId = `iframe-${unitNumber}-${index}`;
-          container.innerHTML = `
-            <p>📄 ${file.name}
-              <button class="btn" onclick="toggleReader('${iframeId}')">Read</button>
-              <a href="${file.dataUrl}" download><button class="btn download-btn">Download</button></a>
-              <button class="btn delete-btn" onclick="deleteFile(${unitNumber}, ${index})">Delete</button>
-            </p>
-            <iframe id="${iframeId}" src="${file.dataUrl}" style="display:none;"></iframe>
-          `;
-        } else if (ext === 'pptx' || ext === 'docx' || ext === 'doc') {
-          // No read preview - just download and delete
-          container.innerHTML = `
-            <p>📄 ${file.name}
-              <a href="${file.dataUrl}" download><button class="btn download-btn">Download</button></a>
-              <button class="btn delete-btn" onclick="deleteFile(${unitNumber}, ${index})">Delete</button>
-            </p>
-          `;
-        } else {
-          // Other files, same treatment
-          container.innerHTML = `
-            <p>📄 ${file.name}
-              <a href="${file.dataUrl}" download><button class="btn download-btn">Download</button></a>
-              <button class="btn delete-btn" onclick="deleteFile(${unitNumber}, ${index})">Delete</button>
-            </p>
-          `;
+        // File info span
+        const fileInfo = document.createElement('span');
+        fileInfo.className = 'file-info';
+        fileInfo.textContent = `${file.name} (uploaded by ${file.owner})`;
+
+        fileDiv.appendChild(fileInfo);
+
+        // Buttons container
+        const btns = document.createElement('span');
+
+        if (isPdf) {
+          // Read button toggles iframe
+          const readBtn = document.createElement('button');
+          readBtn.className = 'btn read';
+          readBtn.textContent = 'Read';
+          readBtn.onclick = () => toggleReader(file.id);
+          btns.appendChild(readBtn);
         }
-        fileDisplay.appendChild(container);
+
+        // Download button
+        const downloadLink = document.createElement('a');
+        downloadLink.href = file.url;
+        downloadLink.download = file.name;
+        downloadLink.target = '_blank';
+
+        const downloadBtn = document.createElement('button');
+        downloadBtn.className = 'btn';
+        downloadBtn.textContent = 'Download';
+
+        downloadLink.appendChild(downloadBtn);
+        btns.appendChild(downloadLink);
+
+        // Delete button only if owner
+        if (file.owner === currentUser) {
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'btn delete';
+          deleteBtn.textContent = 'Delete';
+          deleteBtn.onclick = () => {
+            if (confirm(`Delete file "${file.name}"?`)) {
+              deleteFile(unitNumber, file.id);
+            }
+          };
+          btns.appendChild(deleteBtn);
+        }
+
+        fileDiv.appendChild(btns);
+
+        // Iframe to read pdf inline
+        if (isPdf) {
+          const iframe = document.createElement('iframe');
+          iframe.id = file.id;
+          iframe.src = file.url;
+          iframe.style.display = 'none';
+          fileDiv.appendChild(iframe);
+        }
+
+        container.appendChild(fileDiv);
       });
     }
 
-    // Delete file from storage and reload display
-    function deleteFile(unitNumber, fileIndex) {
-      let files = JSON.parse(localStorage.getItem(`unit${unitNumber}_files`) || '[]');
-      files.splice(fileIndex, 1);
-      localStorage.setItem(`unit${unitNumber}_files`, JSON.stringify(files));
-      loadFiles(unitNumber);
-    }
-
-    // Toggle iframe display for PDF reading
     function toggleReader(id) {
       const iframe = document.getElementById(id);
-      if (iframe.style.display === 'none') {
-        iframe.style.display = 'block';
-      } else {
-        iframe.style.display = 'none';
-      }
+      if (!iframe) return;
+      iframe.style.display = iframe.style.display === 'block' ? 'none' : 'block';
     }
 
-    // Save video or contact links with delete option
+    function deleteFile(unitNumber, fileId) {
+      if (!savedData[unitNumber]) return;
+      savedData[unitNumber].files = savedData[unitNumber].files.filter(f => f.id !== fileId);
+      saveData();
+      renderUnitFiles(unitNumber);
+    }
+
+    // Save video/contact links
     function saveLink(unit, value, type) {
-      if (!value) return;
-      localStorage.setItem(`unit${unit}_${type}`, value);
-      loadExtras(unit);
+      if (!savedData[unit]) savedData[unit] = { files: [], video: '', contact: '' };
+      if (!value.trim()) {
+        savedData[unit][type] = '';
+      } else {
+        // Save with owner info as a JSON string
+        savedData[unit][type] = JSON.stringify({ value: value.trim(), owner: currentUser });
+      }
+      saveData();
+      renderLinks(unit);
     }
 
-    // Load video/contact with delete buttons
-    function loadExtras(unit) {
-      const videoContainer = document.getElementById(`video-link-${unit}`);
-      const contactContainer = document.getElementById(`contact-info-${unit}`);
+    // Render video and contact links with delete for owners
+    function renderLinks(unit) {
+      const videoDiv = document.getElementById(`video-link-${unit}`);
+      const contactDiv = document.getElementById(`contact-info-${unit}`);
 
-      const video = localStorage.getItem(`unit${unit}_video`);
-      const contact = localStorage.getItem(`unit${unit}_contact`);
+      videoDiv.innerHTML = '';
+      contactDiv.innerHTML = '';
 
-      videoContainer.innerHTML = '';
-      contactContainer.innerHTML = '';
-
-      if (video) {
-        videoContainer.innerHTML = `
+      if (savedData[unit] && savedData[unit].video) {
+        const videoObj = JSON.parse(savedData[unit].video);
+        videoDiv.innerHTML = `
           <div class="link-entry">
-            <p>🎥 <a href="${video}" target="_blank" rel="noopener noreferrer">Watch Video</a></p>
-            <button class="btn delete-btn" onclick="deleteLink(${unit}, 'video')">Delete</button>
+            <div class="link-info">🎥 <a href="${videoObj.value}" target="_blank">${videoObj.value}</a> (added by ${videoObj.owner})</div>
+            ${videoObj.owner === currentUser ? '<button class="btn delete" onclick="deleteLink(' + unit + ', \'video\')">Delete</button>' : ''}
           </div>`;
       }
-      if (contact) {
-        contactContainer.innerHTML = `
+
+      if (savedData[unit] && savedData[unit].contact) {
+        const contactObj = JSON.parse(savedData[unit].contact);
+        contactDiv.innerHTML = `
           <div class="link-entry">
-            <p>📞 <a href="${contact}" target="_blank" rel="noopener noreferrer">Contact Peer</a></p>
-            <button class="btn delete-btn" onclick="deleteLink(${unit}, 'contact')">Delete</button>
+            <div class="link-info">📞 ${contactObj.value} (added by ${contactObj.owner})</div>
+            ${contactObj.owner === currentUser ? '<button class="btn delete" onclick="deleteLink(' + unit + ', \'contact\')">Delete</button>' : ''}
           </div>`;
       }
     }
 
-    // Delete video/contact links
     function deleteLink(unit, type) {
-      localStorage.removeItem(`unit${unit}_${type}`);
-      loadExtras(unit);
-      // Also clear input fields
-      const inputs = document.querySelectorAll(`#video-link-${unit} ~ input, #contact-info-${unit} ~ input`);
-      inputs.forEach(input => input.value = '');
+      if (!savedData[unit]) return;
+      savedData[unit][type] = '';
+      saveData();
+      renderLinks(unit);
     }
 
-    // Search filter for units
-    function searchUnits(term) {
-      term = term.toLowerCase();
+    // Save all data to localStorage
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(savedData));
+    }
+
+    // Generate a random ID for files
+    function generateId() {
+      return 'id-' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // Search units by unit number or file/link content
+    function searchUnits(searchTerm) {
+      searchTerm = searchTerm.toLowerCase();
       const units = document.querySelectorAll('.unit');
+
       units.forEach(unit => {
-        const title = unit.querySelector('h2').innerText.toLowerCase();
-        unit.style.display = title.includes(term) ? 'block' : 'none';
+        const unitNumber = unit.dataset.unit;
+
+        let matches = unitNumber.includes(searchTerm);
+
+        // Also check file names
+        if (!matches && savedData[unitNumber] && savedData[unitNumber].files) {
+          matches = savedData[unitNumber].files.some(f => f.name.toLowerCase().includes(searchTerm));
+        }
+
+        // Also check video and contact links
+        if (!matches && savedData[unitNumber]) {
+          const videoText = savedData[unitNumber].video ? JSON.parse(savedData[unitNumber].video).value.toLowerCase() : '';
+          const contactText = savedData[unitNumber].contact ? JSON.parse(savedData[unitNumber].contact).value.toLowerCase() : '';
+          matches = videoText.includes(searchTerm) || contactText.includes(searchTerm);
+        }
+
+        unit.style.display = matches ? 'block' : 'none';
       });
     }
   </script>
