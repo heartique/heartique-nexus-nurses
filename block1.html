@@ -39,21 +39,32 @@
     }
     .file-entry {
       margin: 10px 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
     .btn {
-      background: #4caf50;
+      background: #2e7d32; /* Dark Green */
       color: white;
       border: none;
-      padding: 5px 10px;
-      border-radius: 4px;
+      padding: 6px 14px;
+      border-radius: 5px;
       cursor: pointer;
-      font-size: 0.9em;
+      margin-left: 8px;
+      font-weight: 600;
+      transition: background 0.3s ease;
     }
-    .btn-delete {
-      background: #e53935;
+    .btn:hover {
+      background: #1b5e20; /* Darker Green */
+    }
+    .btn.download-btn {
+      background: #1565c0; /* Blue */
+    }
+    .btn.download-btn:hover {
+      background: #0d47a1; /* Darker Blue */
+    }
+    .btn.delete-btn {
+      background: #d32f2f; /* Red */
+    }
+    .btn.delete-btn:hover {
+      background: #9a0007;
     }
     .editable-input {
       width: 100%;
@@ -73,7 +84,16 @@
       font-size: 16px;
       border: 1px solid #ccc;
       border-radius: 5px;
-      box-sizing: border-box;
+    }
+    .link-entry {
+      margin: 8px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .link-entry a {
+      color: #1565c0;
+      text-decoration: none;
     }
   </style>
 </head>
@@ -89,13 +109,12 @@
     for (let i = 1; i <= 15; i++) {
       const unitDiv = document.createElement('div');
       unitDiv.className = 'unit';
-      unitDiv.id = `unit-${i}`;
       unitDiv.innerHTML = `
         <h2>Unit ${i}</h2>
 
         <div class="upload-section">
           <label>Upload study files (PDF/DOCX/PPTX):</label><br />
-          <input type="file" multiple onchange="handleUpload(event, ${i})" accept=".pdf,.doc,.docx,.ppt,.pptx">
+          <input type="file" multiple onchange="handleUpload(event, ${i})">
         </div>
 
         <div id="file-list-${i}"></div>
@@ -116,111 +135,135 @@
       loadFiles(i);
     }
 
+    // Store uploaded files per unit in localStorage
     function handleUpload(event, unitNumber) {
       const files = event.target.files;
       if (!files.length) return;
 
-      // Load existing files from localStorage
-      let savedFiles = JSON.parse(localStorage.getItem(`unit${unitNumber}_files`) || "[]");
+      let savedFiles = JSON.parse(localStorage.getItem(`unit${unitNumber}_files`) || '[]');
 
       Array.from(files).forEach(file => {
-        // Use FileReader to read file as Data URL for persistence
         const reader = new FileReader();
-        reader.onload = e => {
-          const fileDataUrl = e.target.result;
+        reader.onload = function(e) {
           savedFiles.push({
             name: file.name,
             type: file.type,
-            dataUrl: fileDataUrl
+            dataUrl: e.target.result
           });
           localStorage.setItem(`unit${unitNumber}_files`, JSON.stringify(savedFiles));
           loadFiles(unitNumber);
-        };
+        }
         reader.readAsDataURL(file);
       });
-
-      // Reset input
-      event.target.value = '';
+      event.target.value = ''; // Reset file input
     }
 
+    // Load and display files with Read, Download & Delete buttons
     function loadFiles(unitNumber) {
       const fileDisplay = document.getElementById(`file-list-${unitNumber}`);
-      let savedFiles = JSON.parse(localStorage.getItem(`unit${unitNumber}_files`) || "[]");
+      const files = JSON.parse(localStorage.getItem(`unit${unitNumber}_files`) || '[]');
       fileDisplay.innerHTML = '';
 
-      savedFiles.forEach((file, idx) => {
+      files.forEach((file, index) => {
         const ext = file.name.split('.').pop().toLowerCase();
+
         const container = document.createElement('div');
         container.className = 'file-entry';
 
-        let readBtn = '';
+        // For PDF show Read button & iframe, for others only Download & Delete
         if (ext === 'pdf') {
-          const iframeId = `iframe-${unitNumber}-${idx}`;
-          readBtn = `<button class="btn" onclick="toggleReader('${iframeId}')">Read</button>`;
+          const iframeId = `iframe-${unitNumber}-${index}`;
           container.innerHTML = `
-            <p>📄 ${file.name}</p>
-            ${readBtn}
-            <a href="${file.dataUrl}" download="${file.name}"><button class="btn">Download</button></a>
-            <button class="btn btn-delete" onclick="deleteFile(${unitNumber}, ${idx})">Delete</button>
+            <p>📄 ${file.name}
+              <button class="btn" onclick="toggleReader('${iframeId}')">Read</button>
+              <a href="${file.dataUrl}" download><button class="btn download-btn">Download</button></a>
+              <button class="btn delete-btn" onclick="deleteFile(${unitNumber}, ${index})">Delete</button>
+            </p>
             <iframe id="${iframeId}" src="${file.dataUrl}" style="display:none;"></iframe>
           `;
-        } else {
+        } else if (ext === 'pptx' || ext === 'docx' || ext === 'doc') {
+          // No read preview - just download and delete
           container.innerHTML = `
-            <p>📄 ${file.name}</p>
-            <a href="${file.dataUrl}" download="${file.name}"><button class="btn">Download</button></a>
-            <button class="btn btn-delete" onclick="deleteFile(${unitNumber}, ${idx})">Delete</button>
+            <p>📄 ${file.name}
+              <a href="${file.dataUrl}" download><button class="btn download-btn">Download</button></a>
+              <button class="btn delete-btn" onclick="deleteFile(${unitNumber}, ${index})">Delete</button>
+            </p>
+          `;
+        } else {
+          // Other files, same treatment
+          container.innerHTML = `
+            <p>📄 ${file.name}
+              <a href="${file.dataUrl}" download><button class="btn download-btn">Download</button></a>
+              <button class="btn delete-btn" onclick="deleteFile(${unitNumber}, ${index})">Delete</button>
+            </p>
           `;
         }
         fileDisplay.appendChild(container);
       });
     }
 
-    function toggleReader(id) {
-      const iframe = document.getElementById(id);
-      iframe.style.display = iframe.style.display === 'block' ? 'none' : 'block';
+    // Delete file from storage and reload display
+    function deleteFile(unitNumber, fileIndex) {
+      let files = JSON.parse(localStorage.getItem(`unit${unitNumber}_files`) || '[]');
+      files.splice(fileIndex, 1);
+      localStorage.setItem(`unit${unitNumber}_files`, JSON.stringify(files));
+      loadFiles(unitNumber);
     }
 
-    function deleteFile(unitNumber, index) {
-      let savedFiles = JSON.parse(localStorage.getItem(`unit${unitNumber}_files`) || "[]");
-      if (index >= 0 && index < savedFiles.length) {
-        savedFiles.splice(index, 1);
-        localStorage.setItem(`unit${unitNumber}_files`, JSON.stringify(savedFiles));
-        loadFiles(unitNumber);
+    // Toggle iframe display for PDF reading
+    function toggleReader(id) {
+      const iframe = document.getElementById(id);
+      if (iframe.style.display === 'none') {
+        iframe.style.display = 'block';
+      } else {
+        iframe.style.display = 'none';
       }
     }
 
+    // Save video or contact links with delete option
     function saveLink(unit, value, type) {
       if (!value) return;
       localStorage.setItem(`unit${unit}_${type}`, value);
       loadExtras(unit);
     }
 
+    // Load video/contact with delete buttons
     function loadExtras(unit) {
+      const videoContainer = document.getElementById(`video-link-${unit}`);
+      const contactContainer = document.getElementById(`contact-info-${unit}`);
+
       const video = localStorage.getItem(`unit${unit}_video`);
       const contact = localStorage.getItem(`unit${unit}_contact`);
 
-      document.getElementById(`video-link-${unit}`).innerHTML = video ? `
-        <p>🎥 <a href="${video}" target="_blank" rel="noopener noreferrer">Watch Video</a>
-          <button class="btn btn-delete" onclick="deleteLink(${unit}, 'video')">Delete</button>
-        </p>` : '';
+      videoContainer.innerHTML = '';
+      contactContainer.innerHTML = '';
 
-      document.getElementById(`contact-info-${unit}`).innerHTML = contact ? `
-        <p>📞 <a href="${contact}" target="_blank" rel="noopener noreferrer">Contact Peer</a>
-          <button class="btn btn-delete" onclick="deleteLink(${unit}, 'contact')">Delete</button>
-        </p>` : '';
+      if (video) {
+        videoContainer.innerHTML = `
+          <div class="link-entry">
+            <p>🎥 <a href="${video}" target="_blank" rel="noopener noreferrer">Watch Video</a></p>
+            <button class="btn delete-btn" onclick="deleteLink(${unit}, 'video')">Delete</button>
+          </div>`;
+      }
+      if (contact) {
+        contactContainer.innerHTML = `
+          <div class="link-entry">
+            <p>📞 <a href="${contact}" target="_blank" rel="noopener noreferrer">Contact Peer</a></p>
+            <button class="btn delete-btn" onclick="deleteLink(${unit}, 'contact')">Delete</button>
+          </div>`;
+      }
     }
 
+    // Delete video/contact links
     function deleteLink(unit, type) {
       localStorage.removeItem(`unit${unit}_${type}`);
       loadExtras(unit);
-      // Clear input fields
-      const inputSelector = type === 'video' ? 
-        `#unit-${unit} input[placeholder="Paste video URL..."]` : 
-        `#unit-${unit} input[placeholder="Enter name/number or WhatsApp link..."]`;
-      const input = document.querySelector(inputSelector);
-      if (input) input.value = '';
+      // Also clear input fields
+      const inputs = document.querySelectorAll(`#video-link-${unit} ~ input, #contact-info-${unit} ~ input`);
+      inputs.forEach(input => input.value = '');
     }
 
+    // Search filter for units
     function searchUnits(term) {
       term = term.toLowerCase();
       const units = document.querySelectorAll('.unit');
