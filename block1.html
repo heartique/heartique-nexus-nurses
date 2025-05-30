@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Block 1 Units</title>
+  <title>Block 1 - Units</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f5f5f5;
       color: #333;
-      padding: 20px;
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
+      padding: 20px;
     }
 
     h1 {
@@ -31,64 +31,97 @@
       border-radius: 8px;
     }
 
-    .unit-list {
-      list-style: none;
-      padding: 0;
-    }
-
-    .unit-list li {
+    details {
       background: white;
       margin: 10px 0;
       padding: 15px;
-      border: 1px solid #ddd;
-      border-left: 5px solid #4caf50;
       border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    .unit-list a {
-      text-decoration: none;
-      color: #4caf50;
+    summary {
       font-weight: bold;
       font-size: 1.1em;
+      cursor: pointer;
+      color: #4caf50;
+    }
+
+    .section {
+      margin-top: 10px;
+      padding-left: 10px;
+    }
+
+    label, input[type="file"] {
+      display: block;
+      margin-top: 8px;
+    }
+
+    .download-link {
+      display: inline-block;
+      margin-top: 10px;
+      background-color: #4caf50;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+
+    .tip {
+      background: #e8f5e9;
+      padding: 10px;
+      border-left: 4px solid #4caf50;
+      border-radius: 6px;
+      margin-top: 15px;
     }
   </style>
 </head>
 <body>
 
-  <h1>Block 1 - Units</h1>
+  <h1>Block 1 - Units Overview</h1>
 
   <div class="search-container">
     <input type="text" id="searchInput" placeholder="Search Unit..." onkeyup="filterUnits()" />
   </div>
 
-  <ul class="unit-list" id="unitList">
-    <!-- List of Units -->
-    <li><a href="block1_unit1.html">Unit 1</a></li>
-    <li><a href="block1_unit2.html">Unit 2</a></li>
-    <li><a href="block1_unit3.html">Unit 3</a></li>
-    <li><a href="block1_unit4.html">Unit 4</a></li>
-    <li><a href="block1_unit5.html">Unit 5</a></li>
-    <li><a href="block1_unit6.html">Unit 6</a></li>
-    <li><a href="block1_unit7.html">Unit 7</a></li>
-    <li><a href="block1_unit8.html">Unit 8</a></li>
-    <li><a href="block1_unit9.html">Unit 9</a></li>
-    <li><a href="block1_unit10.html">Unit 10</a></li>
-    <li><a href="block1_unit11.html">Unit 11</a></li>
-    <li><a href="block1_unit12.html">Unit 12</a></li>
-    <li><a href="block1_unit13.html">Unit 13</a></li>
-    <li><a href="block1_unit14.html">Unit 14</a></li>
-    <li><a href="block1_unit15.html">Unit 15</a></li>
-  </ul>
+  <div id="unitsContainer">
+    <!-- Units 1–15 -->
+    <!-- Generated using a loop idea (in HTML we list them all) -->
+    <script>
+      const unitsHTML = Array.from({length: 15}, (_, i) => {
+        const unitNum = i + 1;
+        return `
+        <details>
+          <summary>Unit ${unitNum}</summary>
+          <div class="section">
+            <h3>Upload Study File</h3>
+            <form>
+              <label for="upload${unitNum}">Choose file:</label>
+              <input type="file" id="upload${unitNum}" />
+            </form>
+
+            <h3>Download Available Files</h3>
+            <a href="#" class="download-link">Download Sample File</a>
+
+            <div class="tip">
+              <strong>🧠 Study Tip:</strong> Study in short sessions (25 mins), then take a 5-minute break!
+            </div>
+          </div>
+        </details>`;
+      }).join('');
+      document.write(unitsHTML);
+    </script>
+  </div>
 
   <script>
     function filterUnits() {
       const input = document.getElementById('searchInput').value.toLowerCase();
-      const units = document.querySelectorAll('#unitList li');
-      units.forEach(unit => {
-        const text = unit.textContent.toLowerCase();
-        unit.style.display = text.includes(input) ? '' : 'none';
+      const details = document.querySelectorAll('#unitsContainer details');
+      details.forEach(detail => {
+        const text = detail.querySelector('summary').textContent.toLowerCase();
+        detail.style.display = text.includes(input) ? '' : 'none';
       });
     }
   </script>
+
 </body>
 </html>
