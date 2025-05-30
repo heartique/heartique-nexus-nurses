@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Block 1 Units - Heartique Nexus Nurses</title>
   <style>
     body {
@@ -39,6 +39,8 @@
     }
     .file-entry {
       margin: 10px 0;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
     }
     .btn {
       background: #4caf50;
@@ -49,11 +51,15 @@
       cursor: pointer;
       margin-left: 5px;
     }
+    .btn-delete {
+      background: #f44336;
+    }
     .editable-input {
       width: 100%;
       padding: 8px;
       margin-top: 5px;
       margin-bottom: 10px;
+      box-sizing: border-box;
     }
     .fun-tip {
       font-style: italic;
@@ -78,9 +84,11 @@
   <script>
     const unitsContainer = document.getElementById('unitsContainer');
 
+    // Load units 1-15
     for (let i = 1; i <= 15; i++) {
       const unitDiv = document.createElement('div');
       unitDiv.className = 'unit';
+      unitDiv.id = `unit-${i}`;
       unitDiv.innerHTML = `
         <h2>Unit ${i}</h2>
 
@@ -104,44 +112,70 @@
       unitsContainer.appendChild(unitDiv);
 
       loadExtras(i);
+      loadFiles(i);
     }
 
+    // Handle file upload and save in localStorage
     function handleUpload(event, unitNumber) {
-      const fileList = event.target.files;
+      const files = event.target.files;
+      if (!files.length) return;
+
+      let storedFiles = JSON.parse(localStorage.getItem(`unit${unitNumber}_files`) || '[]');
+
+      Array.from(files).forEach(file => {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const fileData = {
+            name: file.name,
+            type: file.type,
+            data: e.target.result // base64 data URL
+          };
+          storedFiles.push(fileData);
+          localStorage.setItem(`unit${unitNumber}_files`, JSON.stringify(storedFiles));
+          loadFiles(unitNumber);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      // Reset input after upload so same files can be uploaded again if needed
+      event.target.value = '';
+    }
+
+    // Load files from localStorage and show
+    function loadFiles(unitNumber) {
       const fileDisplay = document.getElementById(`file-list-${unitNumber}`);
+      const files = JSON.parse(localStorage.getItem(`unit${unitNumber}_files`) || '[]');
       fileDisplay.innerHTML = '';
 
-      Array.from(fileList).forEach(file => {
+      files.forEach((file, index) => {
         const ext = file.name.split('.').pop().toLowerCase();
-        const fileURL = URL.createObjectURL(file);
+        const iframeId = `iframe-${unitNumber}-${index}`;
 
         const container = document.createElement('div');
         container.className = 'file-entry';
-
-        const iframeId = `iframe-${unitNumber}-${Math.random().toString(36).substring(2, 9)}`;
 
         if (ext === 'pdf') {
           container.innerHTML = `
             <p>📄 ${file.name}
               <button class="btn" onclick="toggleReader('${iframeId}')">Read</button>
-              <a href="${fileURL}" download><button class="btn">Download</button></a>
+              <a href="${file.data}" download="${file.name}"><button class="btn">Download</button></a>
+              <button class="btn btn-delete" onclick="deleteFile(${unitNumber}, ${index})">Delete</button>
             </p>
-            <iframe id="${iframeId}" src="${fileURL}" style="display:none;"></iframe>
+            <iframe id="${iframeId}" src="${file.data}" style="display:none;"></iframe>
           `;
         } else if (ext === 'docx' || ext === 'pptx') {
-          const officeViewerURL = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fileURL)}`;
           container.innerHTML = `
             <p>📄 ${file.name}
-              <button class="btn" onclick="toggleReader('${iframeId}')">Read</button>
-              <a href="${fileURL}" download><button class="btn">Download</button></a>
+              <span style="color: #999; font-style: italic;">Preview not supported. Please download.</span>
+              <a href="${file.data}" download="${file.name}"><button class="btn">Download</button></a>
+              <button class="btn btn-delete" onclick="deleteFile(${unitNumber}, ${index})">Delete</button>
             </p>
-            <iframe id="${iframeId}" src="${officeViewerURL}" style="display:none;"></iframe>
           `;
         } else {
           container.innerHTML = `
             <p>📄 ${file.name}
-              <span style="color: gray;">(Preview not supported)</span>
-              <a href="${fileURL}" download><button class="btn">Download</button></a>
+              <span style="color: #999; font-style: italic;">Unsupported file type.</span>
+              <button class="btn btn-delete" onclick="deleteFile(${unitNumber}, ${index})">Delete</button>
             </p>
           `;
         }
@@ -150,29 +184,40 @@
       });
     }
 
+    // Toggle iframe visibility
     function toggleReader(id) {
       const iframe = document.getElementById(id);
-      if (iframe.style.display === 'none') {
-        iframe.style.display = 'block';
-      } else {
-        iframe.style.display = 'none';
-      }
+      iframe.style.display = iframe.style.display === 'none' || iframe.style.display === '' ? 'block' : 'none';
     }
 
+    // Delete a file from localStorage and update display
+    function deleteFile(unitNumber, fileIndex) {
+      let files = JSON.parse(localStorage.getItem(`unit${unitNumber}_files`) || '[]');
+      files.splice(fileIndex, 1);
+      localStorage.setItem(`unit${unitNumber}_files`, JSON.stringify(files));
+      loadFiles(unitNumber);
+    }
+
+    // Save video/contact links in localStorage and reload
     function saveLink(unit, value, type) {
-      if (!value) return;
-      localStorage.setItem(`unit${unit}_${type}`, value);
+      if (!value) {
+        localStorage.removeItem(`unit${unit}_${type}`);
+      } else {
+        localStorage.setItem(`unit${unit}_${type}`, value);
+      }
       loadExtras(unit);
     }
 
+    // Load video/contact links
     function loadExtras(unit) {
       const video = localStorage.getItem(`unit${unit}_video`);
       const contact = localStorage.getItem(`unit${unit}_contact`);
 
-      if (video) document.getElementById(`video-link-${unit}`).innerHTML = `<p>🎥 <a href="${video}" target="_blank">Watch Video</a></p>`;
-      if (contact) document.getElementById(`contact-info-${unit}`).innerHTML = `<p>📞 <a href="${contact}" target="_blank">Contact Peer</a></p>`;
+      document.getElementById(`video-link-${unit}`).innerHTML = video ? `<p>🎥 <a href="${video}" target="_blank" rel="noopener noreferrer">Watch Video</a></p>` : '';
+      document.getElementById(`contact-info-${unit}`).innerHTML = contact ? `<p>📞 <a href="${contact}" target="_blank" rel="noopener noreferrer">Contact Peer</a></p>` : '';
     }
 
+    // Search function to filter units by name
     function searchUnits(term) {
       term = term.toLowerCase();
       const units = document.querySelectorAll('.unit');
