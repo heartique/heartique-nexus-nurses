@@ -66,6 +66,17 @@
       text-decoration: none;
     }
 
+    .file-list {
+      margin-top: 10px;
+    }
+
+    .file-list a {
+      display: block;
+      color: #007BFF;
+      text-decoration: underline;
+      margin-bottom: 5px;
+    }
+
     .tip {
       background: #e8f5e9;
       padding: 10px;
@@ -85,43 +96,5 @@
 
   <div id="unitsContainer">
     <!-- Units 1–15 -->
-    <!-- Generated using a loop idea (in HTML we list them all) -->
     <script>
-      const unitsHTML = Array.from({length: 15}, (_, i) => {
-        const unitNum = i + 1;
-        return `
-        <details>
-          <summary>Unit ${unitNum}</summary>
-          <div class="section">
-            <h3>Upload Study File</h3>
-            <form>
-              <label for="upload${unitNum}">Choose file:</label>
-              <input type="file" id="upload${unitNum}" />
-            </form>
-
-            <h3>Download Available Files</h3>
-            <a href="#" class="download-link">Download Sample File</a>
-
-            <div class="tip">
-              <strong>🧠 Study Tip:</strong> Study in short sessions (25 mins), then take a 5-minute break!
-            </div>
-          </div>
-        </details>`;
-      }).join('');
-      document.write(unitsHTML);
-    </script>
-  </div>
-
-  <script>
-    function filterUnits() {
-      const input = document.getElementById('searchInput').value.toLowerCase();
-      const details = document.querySelectorAll('#unitsContainer details');
-      details.forEach(detail => {
-        const text = detail.querySelector('summary').textContent.toLowerCase();
-        detail.style.display = text.includes(input) ? '' : 'none';
-      });
-    }
-  </script>
-
-</body>
-</html>
+      for (let i = 1; i
