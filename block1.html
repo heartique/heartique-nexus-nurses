@@ -2,162 +2,160 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Block 1 - Units</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Block 1 Units - Heartique Nexus Nurses</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      color: #333;
+      background: #f9f9f9;
+      padding: 20px;
       max-width: 900px;
       margin: auto;
-      padding: 20px;
     }
-
     h1 {
+      text-align: center;
       color: #4caf50;
-      text-align: center;
     }
-
-    .search-container {
-      text-align: center;
-      margin: 20px 0;
-    }
-
-    #searchInput {
-      width: 60%;
-      padding: 10px;
-      font-size: 1em;
-      border: 2px solid #4caf50;
-      border-radius: 8px;
-    }
-
-    details {
+    .unit {
       background: white;
-      margin: 10px 0;
-      padding: 15px;
-      border-radius: 6px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-radius: 10px;
+      margin: 20px 0;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
-
-    summary {
-      font-weight: bold;
-      font-size: 1.1em;
-      cursor: pointer;
+    .unit h2 {
       color: #4caf50;
+      margin-bottom: 10px;
     }
-
-    .section {
-      margin-top: 10px;
-      padding-left: 10px;
+    .upload-section input[type="file"] {
+      margin-bottom: 10px;
     }
-
-    input[type="file"] {
+    iframe {
+      width: 100%;
+      height: 400px;
+      border: 1px solid #ccc;
+      margin-bottom: 10px;
+    }
+    .file-entry {
       margin: 10px 0;
     }
-
-    .file-list a {
-      display: block;
-      margin: 5px 0;
-      color: #007BFF;
-      text-decoration: none;
+    .download-btn {
+      float: right;
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
     }
-
-    .tip {
-      background: #e8f5e9;
+    .editable-input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      margin-bottom: 10px;
+    }
+    .fun-tip {
+      font-style: italic;
+      color: #555;
+    }
+    .search-bar {
+      margin-bottom: 20px;
       padding: 10px;
-      border-left: 4px solid #4caf50;
-      border-radius: 6px;
-      margin-top: 15px;
+      width: 100%;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
     }
   </style>
 </head>
 <body>
-
-  <h1>Block 1 - Units</h1>
-
-  <div class="search-container">
-    <input type="text" id="searchInput" placeholder="Search Unit..." onkeyup="filterUnits()" />
-  </div>
+  <h1>📘 Block 1 Units</h1>
+  <input type="text" class="search-bar" placeholder="Search Units..." onkeyup="searchUnits(this.value)">
 
   <div id="unitsContainer"></div>
 
   <script>
-    // Create all 15 units with upload and display sections
-    function createUnits() {
-      const container = document.getElementById("unitsContainer");
-      for (let i = 1; i <= 15; i++) {
-        const unitBox = document.createElement("details");
-        unitBox.innerHTML = `
-          <summary>Unit ${i}</summary>
-          <div class="section">
-            <label>Upload a study file:</label>
-            <input type="file" onchange="handleUpload(event, ${i})" />
-            <div id="fileList${i}" class="file-list"></div>
-            <div class="tip">
-              <strong>🧠 Fun Study Tip:</strong> Review material within 24 hours of learning to boost retention!
-            </div>
-          </div>
-        `;
-        container.appendChild(unitBox);
-      }
+    const unitsContainer = document.getElementById('unitsContainer');
+
+    for (let i = 1; i <= 15; i++) {
+      const unitDiv = document.createElement('div');
+      unitDiv.className = 'unit';
+      unitDiv.innerHTML = `
+        <h2>Unit ${i}</h2>
+
+        <div class="upload-section">
+          <label>Upload study files (PDF/DOCX/PPTX):</label><br />
+          <input type="file" multiple onchange="handleUpload(event, ${i})">
+        </div>
+
+        <div id="file-list-${i}"></div>
+
+        <label>Add Video Learning Link:</label>
+        <input type="text" class="editable-input" placeholder="Paste video URL..." onblur="saveLink(${i}, this.value, 'video')">
+        <div id="video-link-${i}"></div>
+
+        <label>Add Peer Contact Info:</label>
+        <input type="text" class="editable-input" placeholder="Enter name/number or WhatsApp link..." onblur="saveLink(${i}, this.value, 'contact')">
+        <div id="contact-info-${i}"></div>
+
+        <p class="fun-tip">🧠 Fun Study Tip: Review material within 24 hours to strengthen memory retention!</p>
+      `;
+      unitsContainer.appendChild(unitDiv);
+
+      // Load saved video/contact
+      loadExtras(i);
     }
 
-    // Save file data to localStorage
     function handleUpload(event, unitNumber) {
-      const file = event.target.files[0];
-      if (!file) return;
+      const fileList = event.target.files;
+      const fileDisplay = document.getElementById(`file-list-${unitNumber}`);
+      fileDisplay.innerHTML = '';
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const fileData = {
-          name: file.name,
-          url: e.target.result
-        };
+      Array.from(fileList).forEach(file => {
+        const fileURL = URL.createObjectURL(file);
+        const ext = file.name.split('.').pop().toLowerCase();
 
-        const key = `unit${unitNumber}_files`;
-        const stored = JSON.parse(localStorage.getItem(key) || "[]");
-        stored.push(fileData);
-        localStorage.setItem(key, JSON.stringify(stored));
+        const container = document.createElement('div');
+        container.className = 'file-entry';
 
-        displayFiles(unitNumber);
-      };
-      reader.readAsDataURL(file);
-    }
+        if (ext === 'pdf') {
+          container.innerHTML = `
+            <iframe src="${fileURL}"></iframe>
+            <a href="${fileURL}" download><button class="download-btn">Download</button></a>
+          `;
+        } else {
+          container.innerHTML = `
+            <p>📄 ${file.name}</p>
+            <a href="${fileURL}" download><button class="download-btn">Download</button></a>
+          `;
+        }
 
-    // Display all files for a specific unit
-    function displayFiles(unitNumber) {
-      const key = `unit${unitNumber}_files`;
-      const files = JSON.parse(localStorage.getItem(key) || "[]");
-      const list = document.getElementById(`fileList${unitNumber}`);
-      list.innerHTML = "";
-
-      files.forEach(file => {
-        const link = document.createElement("a");
-        link.href = file.url;
-        link.textContent = file.name;
-        link.download = file.name;
-        list.appendChild(link);
+        fileDisplay.appendChild(container);
       });
     }
 
-    // Search functionality
-    function filterUnits() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
-      const details = document.querySelectorAll("#unitsContainer details");
-      details.forEach(detail => {
-        const text = detail.querySelector("summary").textContent.toLowerCase();
-        detail.style.display = text.includes(query) ? "" : "none";
-      });
+    function saveLink(unit, value, type) {
+      if (!value) return;
+      localStorage.setItem(`unit${unit}_${type}`, value);
+      loadExtras(unit);
     }
 
-    // Init
-    window.onload = () => {
-      createUnits();
-      for (let i = 1; i <= 15; i++) {
-        displayFiles(i);
-      }
-    };
+    function loadExtras(unit) {
+      const video = localStorage.getItem(`unit${unit}_video`);
+      const contact = localStorage.getItem(`unit${unit}_contact`);
+
+      if (video) document.getElementById(`video-link-${unit}`).innerHTML = `<p>🎥 <a href="${video}" target="_blank">Watch Video</a></p>`;
+      if (contact) document.getElementById(`contact-info-${unit}`).innerHTML = `<p>📞 <a href="${contact}" target="_blank">Contact Peer</a></p>`;
+    }
+
+    function searchUnits(term) {
+      term = term.toLowerCase();
+      const units = document.querySelectorAll('.unit');
+      units.forEach(unit => {
+        const title = unit.querySelector('h2').innerText.toLowerCase();
+        unit.style.display = title.includes(term) ? 'block' : 'none';
+      });
+    }
   </script>
-
 </body>
 </html>
