@@ -22,8 +22,21 @@
     #welcomeText {
       text-align: center;
       font-size: 1.4em;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
       color: #444;
+    }
+
+    .search-container {
+      text-align: center;
+      margin: 20px 0 30px;
+    }
+
+    #searchInput {
+      width: 60%;
+      padding: 10px;
+      font-size: 1em;
+      border: 2px solid #ba0f30;
+      border-radius: 8px;
     }
 
     p {
@@ -121,12 +134,31 @@
       font-size: 0.9em;
       color: #777;
     }
+
+    .logout-btn {
+      display: block;
+      margin: 30px auto 10px;
+      padding: 10px 20px;
+      background-color: #ba0f30;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    .logout-btn:hover {
+      background-color: #a00c28;
+    }
   </style>
 </head>
 <body>
 
   <h1>❤️ Heartique Nexus Nurses</h1>
   <h2 id="welcomeText">Welcome!</h2>
+
+  <div class="search-container">
+    <input type="text" id="searchInput" placeholder="🔍 Search topics, blocks, or materials..." onkeyup="filterBlocks()" />
+  </div>
 
   <p>
     Welcome to <strong>Heartique Nexus Nurses</strong>, your dedicated online revision portal created especially for nursing students and tutors. 
@@ -175,11 +207,26 @@
     © 2025 Heartique Nexus Nurses. All rights reserved.
   </div>
 
-  <script>
-    const user = localStorage.getItem("userName") || "Guest";
-    document.getElementById("welcomeText").textContent = `Welcome, ${user}!`;
-  </script>
   <button class="logout-btn" onclick="logout()">Logout</button>
 
+  <script>
+    function filterBlocks() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const blocks = document.querySelectorAll('.blocks a');
+
+      blocks.forEach(block => {
+        const text = block.textContent.toLowerCase();
+        block.style.display = text.includes(input) ? 'block' : 'none';
+      });
+    }
+
+    const user = localStorage.getItem("userName") || "Guest";
+    document.getElementById("welcomeText").textContent = `Welcome, ${user}!`;
+
+    function logout() {
+      localStorage.removeItem("userName");
+      location.reload();
+    }
+  </script>
 </body>
 </html>
