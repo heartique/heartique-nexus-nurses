@@ -35,18 +35,19 @@
       height: 400px;
       border: 1px solid #ccc;
       margin-bottom: 10px;
+      display: none;
     }
     .file-entry {
       margin: 10px 0;
     }
-    .download-btn {
-      float: right;
+    .btn {
       background: #4caf50;
       color: white;
       border: none;
       padding: 5px 10px;
       border-radius: 4px;
       cursor: pointer;
+      margin-left: 5px;
     }
     .editable-input {
       width: 100%;
@@ -102,7 +103,6 @@
       `;
       unitsContainer.appendChild(unitDiv);
 
-      // Load saved video/contact
       loadExtras(i);
     }
 
@@ -118,15 +118,21 @@
         const container = document.createElement('div');
         container.className = 'file-entry';
 
+        const iframeId = `iframe-${unitNumber}-${Math.random().toString(36).substring(2, 9)}`;
+
         if (ext === 'pdf') {
           container.innerHTML = `
-            <iframe src="${fileURL}"></iframe>
-            <a href="${fileURL}" download><button class="download-btn">Download</button></a>
+            <p>📄 ${file.name}
+              <button class="btn" onclick="document.getElementById('${iframeId}').style.display='block'">Read</button>
+              <a href="${fileURL}" download><button class="btn">Download</button></a>
+            </p>
+            <iframe id="${iframeId}" src="${fileURL}"></iframe>
           `;
         } else {
           container.innerHTML = `
-            <p>📄 ${file.name}</p>
-            <a href="${fileURL}" download><button class="download-btn">Download</button></a>
+            <p>📄 ${file.name}
+              <a href="${fileURL}" download><button class="btn">Download</button></a>
+            </p>
           `;
         }
 
